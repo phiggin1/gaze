@@ -60,7 +60,7 @@ def xyz_to_mat44(pos):
 def xyzw_to_mat44(ori):
     return tf.transformations.quaternion_matrix((ori.x, ori.y, ori.z, ori.w))
 
-def get_head_pose(head, translation, rotation):
+def get_head_pose(head, translation, rotation, t):
     head_pos = [head['position']['x'], 
                 head['position']['y'], 
                 head['position']['z']]
@@ -97,22 +97,22 @@ def get_head_pose(head, translation, rotation):
     quat = tuple(tf.transformations.quaternion_from_matrix(txpose))
 
     head_in_kinect_frame = (Point(*xyz))
-    gaze_in_kinect_frame = R.from_quat(quat).apply([0.0, 0.0, 1.0])
+    gaze_in_kinect_frame = R.from_quat(quat).apply([1.0, 0.0, 0.0])
 
     return head_in_kinect_frame, gaze_in_kinect_frame
 
 def get_closeest_object(position, object_positions):
     min_dist = 10000.0
     name = 'other'
-    print(position)
+    #print(position)
     for obj_name in object_positions.keys():
         #d = distance(position, object_positions[obj_name])
         d =  math.sqrt( (position[0]-object_positions[obj_name][0])**2 + (position[2]-object_positions[obj_name][2])**2 )
-        print(obj_name, object_positions[obj_name], d)
+        #print(obj_name, object_positions[obj_name], d)
         if d < min_dist:
             name = obj_name
             min_dist = d
-    print(name, min_dist)
+    #print(name, min_dist)
     return name
 
 scene_transform_topic = "/scene/transform"
@@ -141,17 +141,17 @@ if not args.distancetype in distance_type:
 
 out_file = os.path.splitext(os.path.basename(args.bagfile))[0].split('_')[0]
 print(out_file)
-if not os.path.isdir( os.path.join('gaze', out_file, args.distancetype) ):
-    print(os.path.join('gaze', out_file, args.distancetype))
-    os.makedirs(os.path.join('gaze', out_file, args.distancetype))
+if not os.path.isdir( os.path.join('gaze_data', out_file, args.distancetype) ):
+    print(os.path.join('gaze_data', out_file, args.distancetype))
+    os.makedirs(os.path.join('gaze_data', out_file, args.distancetype))
 
-distances_file = os.path.join('gaze', out_file, args.distancetype,'distances.csv')
+distances_file = os.path.join('gaze_data', out_file, args.distancetype,'distances.csv')
 print(distances_file)
-objects_file = os.path.join('gaze', out_file, args.distancetype,'objects.csv')
+objects_file = os.path.join('gaze_data', out_file, args.distancetype,'objects.csv')
 print(objects_file)
-audio_file = os.path.join('gaze', out_file, args.distancetype,'audio.csv')
+audio_file = os.path.join('gaze_data', out_file, args.distancetype,'audio.csv')
 print(audio_file)
-button_file = os.path.join('gaze', out_file, args.distancetype,'buttons.csv')
+button_file = os.path.join('gaze_data', out_file, args.distancetype,'buttons.csv')
 print(button_file)
 
 bag = rosbag.Bag(args.bagfile)
@@ -195,16 +195,51 @@ object_positions = {}
 
 has_head_pose = False
 
-print('pre tf')
-bag_transformer = BagTfTransformer(args.bagfile)
-print('post tf')
 
+bag_transformer = BagTfTransformer(args.bagfile)
+'''
+x_head = []
+y_head = []
+z_head = []
+
+x_gaze = []
+y_gaze = []
+z_gaze = []
+
+x_unity = []
+y_unity = []
+z_unity = []
+
+x_ros = []
+y_ros = []
+z_ros = []
+'''
 for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_topic]):
+
+
     if topic == scene_transform_topic:
         transforms = json.loads(msg.data)
         translation, rotation = bag_transformer.lookupTransform(pointcloud_frame, odom_frame, t)
-        head_in_kinect_frame, gaze_in_kinect_frame = get_head_pose(transforms[head_index], translation, rotation)
+        head_in_kinect_frame, gaze_in_kinect_frame = get_head_pose(transforms[head_index], translation, rotation, t)
+        '''
+        x_head = []
+        y_head = []
+        z_head = []
+        x_gaze = []
+        y_gaze = []
+        z_gaze = []
+        x_unity = []
+        y_unity = []
+        z_unity = []
+        
+        x_head.append(head_in_kinect_frame.x)
+        y_head.append(head_in_kinect_frame.y)
+        z_head.append(head_in_kinect_frame.z)
 
+        x_gaze.append(gaze_in_kinect_frame[0])
+        y_gaze.append(gaze_in_kinect_frame[1])
+        z_gaze.append(gaze_in_kinect_frame[2])
+        '''
         mat44 = np.dot(tf.transformations.translation_matrix(translation), tf.transformations.quaternion_matrix(rotation))
         #print(translation)
         for i, transform  in enumerate(transforms[6:]):
@@ -227,19 +262,24 @@ for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_top
                 # txpose is the new pose in target_frame as a 4x4
                 txpose = np.dot(mat44, pose44)
                 object_positions[name] = tuple(tf.transformations.translation_from_matrix(txpose))[:3]
+                '''
+                x_unity.append(object_positions[name][0])
+                y_unity.append(object_positions[name][1])
+                z_unity.append(object_positions[name][2])
+                '''
                 #print('--------')
                 #print(translation)
                 #print(p.x,p.y,p.z)
                 #print(object_positions[name])
                 
-                object_positions[name] =[ transform['position']['x'], transform['position']['y'], transform['position']['z'] ]
+                #object_positions[name] =[ transform['position']['x'], transform['position']['y'], transform['position']['z'] ]
 
         has_head_pose = True
 
     elif topic == object_topic and has_head_pose:
         #if len(msg.clusters) > 10:
-        print('-----------------')
-        print( len(msg.clusters) )
+        #print('-----------------')
+        #print( len(msg.clusters) )
         head_pos = np.asarray( [head_in_kinect_frame.x,
                                 head_in_kinect_frame.y,
                                 head_in_kinect_frame.z])
@@ -258,6 +298,11 @@ for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_top
 
             for p in point_cloud2.read_points(obj):
                 position = np.asarray( p[0:3] )
+                '''
+                x_ros.append(position[0])
+                y_ros.append(position[1])
+                z_ros.append(position[2])
+                '''
                 name = get_closeest_object(position, object_positions)
                 
                 if args.distancetype == 'euclidien_distance':
@@ -271,19 +316,55 @@ for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_top
                 dist[name]=d
                 if d < min_dist:
                     min_dist = d
-                    min_name = name
+                    min_name = name[9:].split('_')[0]
                     min_index = i
-                break
+                
+        '''
+        print('================')
+        print(x_head)
+        print(y_head)
+        print(z_head)
+        print('================')
+        print(x_gaze)
+        print(y_gaze)
+        print(z_gaze)
+        print('================')
+        print(x_unity)
+        print(y_unity)
+        print(z_unity)
+        print('================')
+        print(x_ros)
+        print(y_ros)
+        print(z_ros)
+        print('================')
 
-        print(t.to_sec(), min_name, min_index, min_dist)
+        fig = plt.figure()
+        ax = plt.axes(projection='3d')
+        ax.scatter3D(x_head, y_head, z_head, 'green')
+        ax.scatter3D(x_gaze, y_gaze, z_gaze, 'yellow')
+        ax.scatter3D(x_unity, y_unity, z_unity, 'red')
+        ax.scatter3D(x_ros, y_ros, z_ros, 'blue')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+        plt.show()
+        '''
           
         if len(closest_objects) > 0:
-            if closest_objects[-1][1] != min_index:
-                closest_objects.append( (t.to_sec(), min_index, min_dist) )
+            #print(t.to_sec(), closest_objects[-1][1] , min_name, closest_objects[-1][1] != min_name)
+            #print( closest_objects[-1][1][9:].split('_')[0] )
+            #print( min_name[9:].split('_')[0] )
+            #print(t.to_sec(), closest_objects[-1][1][9:].split('_')[0] , min_name[9:].split('_')[0], closest_objects[-1][1][9:].split('_')[0] == min_name[9:].split('_')[0])
+            if closest_objects[-1][1] !=  min_name:
+            #if closest_objects[-1][1][9:].split('_')[0] != min_name[9:].split('_')[0]:
+                closest_objects.append( (t.to_sec(), min_name, min_dist) )
+                print(t.to_sec(), min_name, min_index, min_dist)
         else:
-            closest_objects.append( (t.to_sec(), min_index, min_dist) )
+            closest_objects.append( (t.to_sec(), min_name, min_dist) )
+            print(t.to_sec(), min_name, min_index, min_dist)
 
         distances.append(dist)
+        
         
         
     
