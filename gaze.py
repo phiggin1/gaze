@@ -102,7 +102,7 @@ def get_head_pose(head, translation, rotation, t):
     return head_in_kinect_frame, gaze_in_kinect_frame
 
 def get_closeest_object(position, object_positions):
-    min_dist = 10000.0
+    min_dist = 0.2
     name = 'other'
     #print(position)
     for obj_name in object_positions.keys():
@@ -132,27 +132,27 @@ parser.add_argument("-d", "--distancetype", default='cosine_distance',
     help='type of distance to use (euclidien_distance, cosine_distance, euclidien_distance, cosine_distance)')
 args = parser.parse_args()
 
-print(args.bagfile)
-print(args.distancetype)
+#print(args.bagfile)
+#print(args.distancetype)
 
 if not args.distancetype in distance_type:
     print('Distance type needs to be (euclidien_distance_3d, cosine_distance_3d, euclidien_distance_2d, cosine_distance_2d)')
     exit()
 
 out_file = os.path.splitext(os.path.basename(args.bagfile))[0].split('_')[0]
-print(out_file)
+#print(out_file)
 if not os.path.isdir( os.path.join('gaze_data', out_file, args.distancetype) ):
-    print(os.path.join('gaze_data', out_file, args.distancetype))
+    #print(os.path.join('gaze_data', out_file, args.distancetype))
     os.makedirs(os.path.join('gaze_data', out_file, args.distancetype))
 
 distances_file = os.path.join('gaze_data', out_file, args.distancetype,'distances.csv')
-print(distances_file)
+#print(distances_file)
 objects_file = os.path.join('gaze_data', out_file, args.distancetype,'objects.csv')
-print(objects_file)
+#print(objects_file)
 audio_file = os.path.join('gaze_data', out_file, args.distancetype,'audio.csv')
-print(audio_file)
+#print(audio_file)
 button_file = os.path.join('gaze_data', out_file, args.distancetype,'buttons.csv')
-print(button_file)
+#print(button_file)
 
 bag = rosbag.Bag(args.bagfile)
 
@@ -168,7 +168,7 @@ table_objects = [
 "/Objects/drill_textured/default", 
 "/Objects/hammer_textured/default", 
 ]
-
+'''
 button_timestamps = []
 for topic, msg, t in bag.read_messages(topics=[button_topic]):
     #print(t.to_sec(), msg.data)
@@ -187,7 +187,7 @@ for topic, msg, t in bag.read_messages(topics=[audio_topic]):
         print('The transcription generator was empty')
     if text != '':
         audio_timestamps.append( (t.to_sec(), t.to_sec()-audio_length, text) )
-
+'''
 head_index = 0
 closest_objects = []
 distances = []
@@ -291,8 +291,9 @@ for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_top
         #print('================')
         #print(head_pos)
         #print(gaze)
-        dist = {'timestamp':t.to_sec(), 'head_pos':head_pos, 'gaze':gaze}
-
+        dist = {'timestamp':t.to_sec()}
+        for name in table_objects:
+            dist[name]=2.0
         for i, obj in enumerate(msg.clusters):
             #print(i, len(obj.data), obj.header.frame_id)
 
@@ -304,20 +305,23 @@ for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_top
                 z_ros.append(position[2])
                 '''
                 name = get_closeest_object(position, object_positions)
-                
-                if args.distancetype == 'euclidien_distance':
-                    euclidien_distance_3d = distance_point_to_ray(np.asfarray(head_pos), np.asfarray(head_pos + gaze), position)
-                    d = euclidien_distance_3d
-                elif args.distancetype == 'cosine_distance':
-                    cosine_distance_3d = cos_distance(gaze, position-head_pos)
-                    d = cosine_distance_3d
+                if name in table_objects:
+                    if args.distancetype == 'euclidien_distance':
+                        euclidien_distance_3d = distance_point_to_ray(np.asfarray(head_pos), np.asfarray(head_pos + gaze), position)
+                        d = euclidien_distance_3d
+                    elif args.distancetype == 'cosine_distance':
+                        cosine_distance_3d = cos_distance(gaze, position-head_pos)
+                        d = cosine_distance_3d
 
-                #print(i, name, d)
-                dist[name]=d
-                if d < min_dist:
-                    min_dist = d
-                    min_name = name[9:].split('_')[0]
-                    min_index = i
+                    #print(i, name, d)
+                    dist[name]=d
+                    if d<dist[name]:
+                        dist[name]=d
+                    if d < min_dist:
+                        min_dist = d
+                        min_name = name[9:].split('_')[0]
+                        min_index = i
+                
                 
         '''
         print('================')
@@ -358,10 +362,11 @@ for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_top
             if closest_objects[-1][1] !=  min_name:
             #if closest_objects[-1][1][9:].split('_')[0] != min_name[9:].split('_')[0]:
                 closest_objects.append( (t.to_sec(), min_name, min_dist) )
-                print(t.to_sec(), min_name, min_index, min_dist)
+                #print(t.to_sec(), min_name, min_index, min_dist)
         else:
             closest_objects.append( (t.to_sec(), min_name, min_dist) )
-            print(t.to_sec(), min_name, min_index, min_dist)
+        #print(dist)
+        #print(t.to_sec(), min_name, min_index, min_dist)
 
         distances.append(dist)
         
@@ -370,14 +375,15 @@ for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_top
     
 bag.close()
 
-distances_csv = pd.DataFrame(distances, columns=['timestamp', 'head_pos', 'head_quat'].extend(table_objects))
+distances_csv = pd.DataFrame(distances)
 distances_csv.to_csv(distances_file, index=False)
 
 objects_csv = pd.DataFrame(closest_objects, columns=['timestamp', 'object', 'distance'])
 objects_csv.to_csv(objects_file, index=False)
-
+'''
 audio_csv = pd.DataFrame(audio_timestamps, columns=['end_timestamp', 'start_timestamp', 'transcript'])
 audio_csv.to_csv(audio_file, index=False)
 
 button_csv = pd.DataFrame(button_timestamps, columns=['timestamp', 'message'])
 button_csv.to_csv(button_file, index=False)
+'''

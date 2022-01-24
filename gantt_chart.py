@@ -9,17 +9,17 @@ parser.add_argument('--basefilename', type=str, required=True, help='Filename of
 parser.add_argument("-d", "--distancetype", default='cosine_distance', 
     help='type of distance to use (euclidien_distance, cosine_distance)')
 args = parser.parse_args()
-print(args.basefilename)
-print(args.distancetype)
+#print(args.basefilename)
+#print(args.distancetype)
 
 out_file = os.path.splitext(os.path.basename(args.basefilename))[0].split('_')[0]
-print(out_file)
+#print(out_file)
 
 
 objects_file = os.path.join('gaze_data', out_file, args.distancetype,'objects.csv')
-print(objects_file)
+#print(objects_file)
 audio_file = os.path.join('gaze_data', out_file, args.distancetype,'audio.csv')
-print(audio_file)
+#print(audio_file)
 
 audio_csv = pd.read_csv(audio_file)
 audio_list = []
@@ -52,7 +52,7 @@ for index, frame in obj_csv.iterrows():
     obj_list.append(frame)
 for i in range(len(obj_list)-1):
     obj_name = str(obj_list[i]['object'])#[9:].split('_')[0]
-    print(obj_name)
+    #print(obj_name)
     start = obj_list[i]['timestamp']
     end =  obj_list[i+1]['timestamp']
     df_obj.append(
