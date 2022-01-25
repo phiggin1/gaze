@@ -1,4 +1,3 @@
-from cmath import nan
 import pandas as pd
 import argparse
 import os
@@ -43,12 +42,18 @@ audio_list = []
 df_audio = []
 for index, frame in audio_csv.iterrows():
     audio_list.append(frame)
-
+    flag = False
+    for obj in table_objects:
+        #if frame.has_key(obj):
+        if frame['transcript'] == obj[9:].split('_')[0]:
+            flag = True
+    if not flag:
+        print(flag)
+        
 obj_csv = pd.read_csv(objects_file)
 obj_list = []
 df_obj = []
 count = 0
-correct = 0
 top_n = np.zeros(len(table_objects))
 for index, frame in obj_csv.iterrows():
     for audio in audio_list:
@@ -64,7 +69,6 @@ for index, frame in obj_csv.iterrows():
 
             #print(frame['timestamp'], audio['transcript'], dist)
             if audio['transcript'] == dist[0][1]:
-                correct += 1
                 top_n[0] += 1
                 top_n[1] += 1
                 top_n[2] += 1
@@ -84,12 +88,13 @@ for index, frame in obj_csv.iterrows():
                 top_n[3] += 1
                 top_n[4] += 1
                 top_n[5] += 1
-            '''
-            elif audio['transcript'] == dist[3][1]:
-                top_n[3] += 1
-                top_n[4] += 1
-                top_n[5] += 1
-            '''
+            
             count +=1
+'''
+print(args.basefilename.split('_')[0])
+print(count)
 print(top_n[:3])
 print(top_n[:3]/count)
+'''
+
+print( args.basefilename.split('_')[0]+', ' + np.array2string(top_n[:3]/count, precision=4, separator=', ')[1:-1] )

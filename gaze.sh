@@ -13,11 +13,13 @@ else
             filename=$(basename -- "$entry")
             extension="${filename##*.}"
             filename="${filename%.*}"
-            echo "$filename"
-            python2 extract_audio.py --bagfile $entry #--distancetype $distance_type
-            python2 gaze.py --bagfile $entry #--distancetype $distance_type
-            python3 gantt_chart.py --basefilename $filename #--distancetype $distance_type
-            python accuracy.py --basefilename $filename #--distancetype $distance_type
+            #echo $entry
+            #rosbag info $entry
+            #python2 extract_audio.py --bagfile "$entry"
+            #python2 gaze.py --bagfile $entry 
+            python3 gantt_chart.py --basefilename $filename 
+            python accuracy.py --basefilename $filename
+            
         done
   else
     echo "Requires valid directory"

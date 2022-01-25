@@ -27,7 +27,7 @@ df_audio = []
 for index, frame in audio_csv.iterrows():
     audio_list.append(frame)
 for i in range(len(audio_list)):
-    transcript = audio_list[i]['transcript']
+    transcript = audio_list[i]['transcript']+"-Ground Truth"
     start = audio_list[i]['start_timestamp']
     end =  audio_list[i]['end_timestamp']
     df_audio.append(
