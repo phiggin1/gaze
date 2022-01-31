@@ -19,7 +19,7 @@ else
             #python2 gaze.py --bagfile $entry 
             python3 gantt_chart.py --basefilename $filename 
             #python accuracy.py --basefilename $filename
-            
+            #break
         done
   else
     echo "Requires valid directory"
