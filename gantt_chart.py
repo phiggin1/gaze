@@ -3,6 +3,7 @@ import pandas as pd
 import argparse
 import os
 import numpy as np
+from operator import itemgetter
 
 table_objects = [
 "/Objects/Bowl_1", 
@@ -44,6 +45,7 @@ audio_csv = pd.read_csv(audio_file)
 audio_list = []
 for index, frame in audio_csv.iterrows():
     audio_list.append(frame)
+
 for i in range(len(audio_list)):
     transcript = audio_list[i]['transcript']+"-Ground Truth"
     start = audio_list[i]['start_timestamp']
@@ -54,97 +56,57 @@ for i in range(len(audio_list)):
 
 start_time = audio_list[0]['start_timestamp']
 end_time = audio_list[-1]['end_timestamp']
-print(start_time , end_time )
-obj_csv = pd.read_csv(objects_file)
+
+obj_csv = pd.read_csv(distances_file)
 obj_list = []
+
 for index, frame in obj_csv.iterrows():
-    obj_list.append(frame)
+    dist =[]
+    for obj in table_objects:
+        if not np.isnan(frame[obj]): 
+            dist.append( (frame[obj], obj[9:].split('_')[0]) )
+
+    dist = sorted(dist,key=itemgetter(0))
+    closest = dist[0][1]
+
+    if len(obj_list) > 0:
+        if obj_list[-1][1] !=  closest:
+            obj_list.append( (frame['timestamp'], closest) )
+
+    else:
+        obj_list.append( (frame['timestamp'], closest) )
+
+
+
 for i in range(len(obj_list)-1):
-    obj_name = str(obj_list[i]['object'])#[9:].split('_')[0]
-    start = obj_list[i]['timestamp']
-    end =  obj_list[i+1]['timestamp']
+    obj_name = obj_list[i][1]#[9:].split('_')[0]
+    start = obj_list[i][0]
+    end =  obj_list[i+1][0]
     if start < end_time and end > start_time:
         df_obj.append(
             {"Objects":obj_name, "start":start, "end":end}
         )
 
+
+
 source_obj = pd.DataFrame(df_obj)
 chart_obj = alt.Chart(source_obj).mark_bar().encode(
     x = alt.X('start',
-        scale=alt.Scale(zero=False)
+        scale=alt.Scale(zero=False), title="Time"
     ),
     x2='end',
-    y = alt.Y('Objects', sort=['Bread', "Bread-Ground Truth",'Lettuce',"Lettuce-Ground Truth",'Apple',"Apple-Ground Truth",'Tomato',"Tomato-Ground Truth",'Mug',"Mug-Ground Truth",'Bowl',"Bowl-Ground Truth",'watterbottle',"watterbottle-Ground Truth",'firstaid',"firstaid-Ground Truth",'drill',"drill-Ground Truth",'hammer',"hammer-Ground Truth"], title=""),
-    color=alt.Color('Objects', scale=alt.Scale(scheme='dark2'))
+    y = alt.Y('Objects', sort=['Bread', "Bread-Ground Truth",'Lettuce',"Lettuce-Ground Truth",'Apple',"Apple-Ground Truth",'Tomato',"Tomato-Ground Truth",'Mug',"Mug-Ground Truth",'Bowl',"Bowl-Ground Truth",'waterbottle',"waterbottle-Ground Truth",'firstaid',"firstaid-Ground Truth",'drill',"drill-Ground Truth",'hammer',"hammer-Ground Truth"], title=""),
+    color=alt.Color('Objects', scale=alt.Scale(
+        domain=['Bread', "Bread-Ground Truth",'Lettuce',"Lettuce-Ground Truth",'Apple',"Apple-Ground Truth",'Tomato',"Tomato-Ground Truth",'Mug',"Mug-Ground Truth",'Bowl',"Bowl-Ground Truth",'waterbottle',"waterbottle-Ground Truth",'firstaid',"firstaid-Ground Truth",'drill',"drill-Ground Truth",'hammer',"hammer-Ground Truth"],
+        range=['red', "blue",'orange',"blue",'yellow',"blue",'green',"blue",'red',"blue",'orange',"blue",'yellow',"blue",'green',"blue",'red',"blue",'yellow',"blue"]
+        ), legend=None)
 ).properties(
     width=1200,
     height=300
 )
 
 chart_obj.save('gaze_data/'+out_file+'_gaze.html')
-
 '''
-heat maps
+domain=['Bread', "Bread-Ground Truth",'Lettuce',"Lettuce-Ground Truth",'Apple',"Apple-Ground Truth",'Tomato',"Tomato-Ground Truth",'Mug',"Mug-Ground Truth",'Bowl',"Bowl-Ground Truth",'waterbottle',"waterbottle-Ground Truth",'firstaid',"firstaid-Ground Truth",'drill',"drill-Ground Truth",'hammer',"hammer-Ground Truth"],
+range=[['red', "blue",'orange',"blue",'yellow',"blue",'green',"blue",'red',"blue",'orange',"blue",'yellow',"blue",'green',"blue",'red',"blue",'yellow',"blue"]
 '''
-
-#plot of when user was describing objects
-df_audio = []
-audio_csv = pd.read_csv(audio_file)
-audio_list = []
-for index, frame in audio_csv.iterrows():
-    audio_list.append(frame)
-for i in range(len(audio_list)):
-    transcript = audio_list[i]['transcript']+"-Ground Truth"
-    start = audio_list[i]['start_timestamp']
-    end =  audio_list[i]['end_timestamp']
-    df_audio.append(
-        {"Objects":transcript ,"start":start, "end":end}
-    )
-
-source_obj = pd.DataFrame(df_audio)
-chart_obj = alt.Chart(source_obj).mark_bar().encode(
-    x = alt.X('start',
-        scale=alt.Scale(zero=False)
-    ),
-    x2='end',
-    y = alt.Y('Objects', sort=['Bread', "Bread-Ground Truth",'Lettuce',"Lettuce-Ground Truth",'Apple',"Apple-Ground Truth",'Tomato',"Tomato-Ground Truth",'Mug',"Mug-Ground Truth",'Bowl',"Bowl-Ground Truth",'watterbottle',"watterbottle-Ground Truth",'firstaid',"firstaid-Ground Truth",'drill',"drill-Ground Truth",'hammer',"hammer-Ground Truth"], title=""),
-    color=alt.Color('Objects', scale=alt.Scale(scheme='dark2'))
-).properties(
-    width=1200,
-    height=300
-)
-
-
-#heat map graph
-df_obj = []
-dist_csv = pd.read_csv(distances_file)
-dist_list = []
-for index, frame in dist_csv.iterrows():
-    dist_list.append(frame)
-
-start_time = audio_list[0]['start_timestamp']
-end_time = audio_list[-1]['end_timestamp']
-for obj in table_objects:
-    for frame in dist_list:
-        if start_time <= frame['timestamp'] <= end_time:
-            d = {'timestamp':frame['timestamp']}
-            obj_name = obj[9:].split('_')[0]
-            dist = frame[obj]
-            if dist == 2.0:
-                dist = np.nan
-            d['distance'] = dist
-            d['object']=obj_name
-            
-            df_obj.append(d)
-
-source_obj = pd.DataFrame(df_obj)
-heat = alt.Chart(source_obj).mark_rect().encode(
-    x = alt.X('timestamp:O', scale=alt.Scale(zero=False)),
-    y = alt.Y('object:O', sort=['Bread', "Bread-Ground Truth",'Lettuce',"Lettuce-Ground Truth",'Apple',"Apple-Ground Truth",'Tomato',"Tomato-Ground Truth",'Mug',"Mug-Ground Truth",'Bowl',"Bowl-Ground Truth",'watterbottle',"watterbottle-Ground Truth",'firstaid',"firstaid-Ground Truth",'drill',"drill-Ground Truth",'hammer',"hammer-Ground Truth"], title=""),
-    color = alt.Color('distance:Q',scale=alt.Scale(scheme='plasma'))
-).properties(
-    width=1200,
-    height=200
-)
-
-heat.save('gaze_data/'+out_file+'_heat.html')
