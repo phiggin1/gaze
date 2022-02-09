@@ -44,7 +44,6 @@ for index, frame in audio_csv.iterrows():
     audio_list.append(frame)
     flag = False
     for obj in table_objects:
-        #if frame.has_key(obj):
         if frame['transcript'] == obj[9:].split('_')[0]:
             flag = True
     if not flag:
@@ -55,46 +54,27 @@ obj_list = []
 df_obj = []
 count = 0
 top_n = np.zeros(len(table_objects))
+top_n_test = np.zeros(len(table_objects))
+rank = []
 for index, frame in obj_csv.iterrows():
     for audio in audio_list:
-        #print(audio['start_timestamp'] , frame['timestamp'] , audio['end_timestamp'])
         if audio['start_timestamp'] <= frame['timestamp'] <= audio['end_timestamp']:
             dist =[]
             for obj in table_objects:
-                #if frame.has_key(obj):
                 if not np.isnan(frame[obj]): 
                     dist.append( (frame[obj], obj[9:].split('_')[0]) )
 
             dist = sorted(dist,key=itemgetter(0))
 
-            #print(frame['timestamp'], audio['transcript'], dist)
-            if audio['transcript'] == dist[0][1]:
-                top_n[0] += 1
-                top_n[1] += 1
-                top_n[2] += 1
-                top_n[3] += 1
-                top_n[4] += 1
-                top_n[5] += 1
+            r = [y[1] for y in dist].index(audio['transcript']) #zero indexed rank
+            rank.append(r + 1)
 
-            elif audio['transcript'] == dist[1][1]:
-                top_n[1] += 1
-                top_n[2] += 1
-                top_n[3] += 1
-                top_n[4] += 1
-                top_n[5] += 1
+            for i in range(r, len(top_n)):
+                top_n[i] += 1
 
-            elif audio['transcript'] == dist[2][1]:
-                top_n[2] += 1
-                top_n[3] += 1
-                top_n[4] += 1
-                top_n[5] += 1
-            
             count +=1
-'''
-print(args.basefilename.split('_')[0])
-print(count)
-print(top_n[:3])
-print(top_n[:3]/count)
-'''
+            
+    
+mrr = np.sum([(1.0/r) for r in rank])/len(rank)
 
-print( args.basefilename.split('_')[0]+', ' + np.array2string(top_n[:3]/count, precision=4, separator=', ')[1:-1] )
+print( args.basefilename.split('_')[0]+', ' + np.array2string(top_n[:4]/count, precision=4, separator=', ')[1:-1] + ', ' + str(mrr) )
