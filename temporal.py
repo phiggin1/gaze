@@ -85,6 +85,8 @@ dist_csv = pd.read_csv(distances_file)
 dist_list = []
 for index, frame in dist_csv.iterrows():
     #if 170.0 <= frame['timestamp'] <= 210.0:
+
+    if frame['timestamp'] <= audio_list[0]['end_timestamp']:
         dist_list.append(frame)
 
 d_list = []
@@ -185,12 +187,10 @@ two_charts_template = """
 
 <div id="vis1"></div>
 <div id="vis2"></div>
-<div id="vis3"></div>
 
 <script type="text/javascript">
   vegaEmbed('#vis1', {spec1}).catch(console.error);
   vegaEmbed('#vis2', {spec2}).catch(console.error);
-  vegaEmbed('#vis3', {spec3}).catch(console.error);
 </script>
 </body>
 </html>
@@ -203,8 +203,6 @@ with open('gaze_data/'+out_file+'_charts.html', 'w') as f:
         vegaembed_version=alt.VEGAEMBED_VERSION,
         spec1=dist_plot.to_json(indent=None),
         spec2=vel_plot.to_json(indent=None),
-        spec3=ground_truth_text.to_json(indent=None),
-        
     ))
 
 '''
