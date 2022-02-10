@@ -18,8 +18,9 @@ else
             #python2 extract_audio.py --bagfile "$entry"
             #python2 gaze.py --bagfile $entry 
             python3 gantt_chart.py --basefilename $filename 
+            python3 heatmap.py --basefilename $filename 
             python accuracy.py --basefilename $filename
-            
+            #break
         done
   else
     echo "Requires valid directory"
