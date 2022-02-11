@@ -195,8 +195,9 @@ object_positions = {}
 
 has_head_pose = False
 
-
+print('pre')
 bag_transformer = BagTfTransformer(args.bagfile)
+print('post')
 '''
 x_head = []
 y_head = []
@@ -366,7 +367,7 @@ for topic, msg, t in bag.read_messages(topics=[scene_transform_topic, object_top
         else:
             closest_objects.append( (t.to_sec(), min_name, min_dist) )
         #print(dist)
-        #print(t.to_sec(), min_name, min_index, min_dist)
+        print(t.to_sec(), min_name, min_index, min_dist)
 
         distances.append(dist)
         

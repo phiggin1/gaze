@@ -149,7 +149,7 @@ dist_plot = alt.Chart(source_dist).mark_point(clip=True, size=15, opacity=0.5).e
     width=w,
     height=h
 )
-dist_plot.save('gaze_data/'+out_file+'_dist.html')
+#dist_plot.save('gaze_data/'+out_file+'_dist.html')
 
 
 source_vel = pd.DataFrame(v_list)
@@ -161,7 +161,7 @@ vel_plot = alt.Chart(source_vel).mark_point(clip=True, size=15, opacity=0.5).enc
     width=w,
     height=h
 )
-vel_plot.save('gaze_data/'+out_file+'_vel.html')
+#vel_plot.save('gaze_data/'+out_file+'_vel.html')
 
 '''
 source_accel = pd.DataFrame(a_list)
@@ -175,6 +175,7 @@ accel_plot = alt.Chart(source_accel).mark_point(clip=True).encode(
 )
 accel_plot.save('gaze_data/'+out_file+'_accel.html')
 '''
+
 two_charts_template = """
 <!DOCTYPE html>
 <html>
@@ -196,7 +197,8 @@ two_charts_template = """
 </html>
 """
 alt.data_transformers.disable_max_rows()
-with open('gaze_data/'+out_file+'_charts.html', 'w') as f:
+
+with open(os.path.join('gaze_data', out_file, args.distancetype,out_file+'_charts.html'), 'w') as f:
     f.write(two_charts_template.format(
         vega_version=alt.VEGA_VERSION,
         vegalite_version=alt.VEGALITE_VERSION,

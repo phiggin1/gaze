@@ -51,11 +51,11 @@ for topic, msg, t in bag.read_messages(topics=[audio_topic]):
 
 
 if not os.path.exists(audio_file):
-    print('writing to'+audio_file)
+    #print('writing to'+audio_file)
     audio_csv = pd.DataFrame(audio_timestamps, columns=['end_timestamp', 'start_timestamp', 'transcript'])
     audio_csv.to_csv(audio_file, index=False)
 
 if not os.path.exists(button_file):
-    print('writing to'+button_file)
+    #print('writing to'+button_file)
     button_csv = pd.DataFrame(button_timestamps, columns=['timestamp', 'message'])
     button_csv.to_csv(button_file, index=False)

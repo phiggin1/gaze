@@ -77,4 +77,4 @@ for index, frame in obj_csv.iterrows():
     
 mrr = np.sum([(1.0/r) for r in rank])/len(rank)
 
-print( args.basefilename.split('_')[0]+', ' + np.array2string(top_n[:4]/count, precision=4, separator=', ')[1:-1] + ', ' + str(mrr) )
+print(args.distancetype+', '+ args.basefilename.split('_')[0]+', ' + np.array2string(top_n[:3]/count, precision=4, separator=', ')[1:-1] + ', ' + str(mrr) )

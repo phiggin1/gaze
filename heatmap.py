@@ -108,7 +108,6 @@ for frame in dist_list:
                 d = {'timestamp':frame['timestamp']}
                 d['object'] = o[1]
                 d['distance'] = i
-                #print(d)
                 df_obj.append(d)
                 i += 1
         distances_list.append(dist)
@@ -125,5 +124,7 @@ heat = alt.Chart(source_obj).mark_rect().encode(
     height=300
 )
 
-heat.save('gaze_data/'+out_file+'_heat.html')
+
+heat.save(os.path.join('gaze_data', out_file, args.distancetype,out_file+'_heat.html'))
+
 #(heat+chart_obj).save('gaze_data/'+out_file+'test.html')

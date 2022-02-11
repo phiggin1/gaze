@@ -104,8 +104,8 @@ chart_obj = alt.Chart(source_obj).mark_bar().encode(
     width=1200,
     height=300
 )
+chart_obj.save(os.path.join('gaze_data', out_file, args.distancetype,out_file+'_gaze.html'))
 
-chart_obj.save('gaze_data/'+out_file+'_gaze.html')
 '''
 domain=['Bread', "Bread-Ground Truth",'Lettuce',"Lettuce-Ground Truth",'Apple',"Apple-Ground Truth",'Tomato',"Tomato-Ground Truth",'Mug',"Mug-Ground Truth",'Bowl',"Bowl-Ground Truth",'waterbottle',"waterbottle-Ground Truth",'firstaid',"firstaid-Ground Truth",'drill',"drill-Ground Truth",'hammer',"hammer-Ground Truth"],
 range=[['red', "blue",'orange',"blue",'yellow',"blue",'green',"blue",'red',"blue",'orange',"blue",'yellow',"blue",'green',"blue",'red',"blue",'yellow',"blue"]

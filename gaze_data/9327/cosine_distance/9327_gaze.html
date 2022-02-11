@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .error {
+        color: red;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-lite@4.8.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm//vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 400, "continuousHeight": 300}}, "data": {"name": "data-b7789cf7a503dc21556e1c8550d7342a"}, "mark": "bar", "encoding": {"color": {"type": "nominal", "field": "Objects", "legend": null, "scale": {"domain": ["Bread", "Bread-Ground Truth", "Lettuce", "Lettuce-Ground Truth", "Apple", "Apple-Ground Truth", "Tomato", "Tomato-Ground Truth", "Mug", "Mug-Ground Truth", "Bowl", "Bowl-Ground Truth", "waterbottle", "waterbottle-Ground Truth", "firstaid", "firstaid-Ground Truth", "drill", "drill-Ground Truth", "hammer", "hammer-Ground Truth"], "range": ["red", "blue", "orange", "blue", "yellow", "blue", "green", "blue", "red", "blue", "orange", "blue", "yellow", "blue", "green", "blue", "red", "blue", "yellow", "blue"]}}, "x": {"type": "quantitative", "field": "start", "scale": {"zero": false}, "title": "Time"}, "x2": {"field": "end"}, "y": {"type": "nominal", "field": "Objects", "sort": ["Bread", "Bread-Ground Truth", "Lettuce", "Lettuce-Ground Truth", "Apple", "Apple-Ground Truth", "Tomato", "Tomato-Ground Truth", "Mug", "Mug-Ground Truth", "Bowl", "Bowl-Ground Truth", "waterbottle", "waterbottle-Ground Truth", "firstaid", "firstaid-Ground Truth", "drill", "drill-Ground Truth", "hammer", "hammer-Ground Truth"], "title": ""}}, "height": 300, "width": 1200, "$schema": "https://vega.github.io/schema/vega-lite/v4.8.1.json", "datasets": {"data-b7789cf7a503dc21556e1c8550d7342a": [{"Objects": "Bread-Ground Truth", "start": 1502.674, "end": 1517.664}, {"Objects": "Lettuce-Ground Truth", "start": 1523.386, "end": 1547.826}, {"Objects": "Apple-Ground Truth", "start": 1554.642, "end": 1572.402}, {"Objects": "Tomato-Ground Truth", "start": 1580.92, "end": 1601.16}, {"Objects": "Mug-Ground Truth", "start": 1610.009, "end": 1624.039}, {"Objects": "Bowl-Ground Truth", "start": 1631.247, "end": 1648.297}, {"Objects": "Lettuce", "start": 1496.5720000000001, "end": 1505.9470000000001}, {"Objects": "Bread", "start": 1505.9470000000001, "end": 1506.4920000000002}, {"Objects": "Lettuce", "start": 1506.4920000000002, "end": 1506.9660000000001}, {"Objects": "Bread", "start": 1506.9660000000001, "end": 1507.461}, {"Objects": "Lettuce", "start": 1507.461, "end": 1519.7720000000002}, {"Objects": "Bread", "start": 1519.7720000000002, "end": 1520.904}, {"Objects": "Lettuce", "start": 1520.904, "end": 1547.996}, {"Objects": "Bread", "start": 1547.996, "end": 1548.1589999999999}, {"Objects": "waterbottle", "start": 1548.1589999999999, "end": 1574.433}, {"Objects": "Tomato", "start": 1574.433, "end": 1599.443}, {"Objects": "Bowl", "start": 1599.443, "end": 1600.491}, {"Objects": "waterbottle", "start": 1600.491, "end": 1600.642}, {"Objects": "Bowl", "start": 1600.642, "end": 1603.156}, {"Objects": "Tomato", "start": 1603.156, "end": 1603.8239999999998}, {"Objects": "waterbottle", "start": 1603.8239999999998, "end": 1605.97}, {"Objects": "Tomato", "start": 1605.97, "end": 1608.608}, {"Objects": "Apple", "start": 1608.608, "end": 1613.2579999999998}, {"Objects": "waterbottle", "start": 1613.2579999999998, "end": 1615.115}, {"Objects": "Apple", "start": 1615.115, "end": 1615.245}, {"Objects": "waterbottle", "start": 1615.245, "end": 1617.3770000000002}, {"Objects": "Apple", "start": 1617.3770000000002, "end": 1617.477}, {"Objects": "waterbottle", "start": 1617.477, "end": 1618.6860000000001}, {"Objects": "Apple", "start": 1618.6860000000001, "end": 1620.141}, {"Objects": "waterbottle", "start": 1620.141, "end": 1620.2520000000002}, {"Objects": "Apple", "start": 1620.2520000000002, "end": 1621.149}, {"Objects": "waterbottle", "start": 1621.149, "end": 1621.757}, {"Objects": "Apple", "start": 1621.757, "end": 1621.9720000000002}, {"Objects": "waterbottle", "start": 1621.9720000000002, "end": 1623.006}, {"Objects": "Apple", "start": 1623.006, "end": 1624.069}, {"Objects": "waterbottle", "start": 1624.069, "end": 1624.266}, {"Objects": "Apple", "start": 1624.266, "end": 1625.109}, {"Objects": "Bowl", "start": 1625.109, "end": 1628.4089999999999}, {"Objects": "Tomato", "start": 1628.4089999999999, "end": 1628.763}, {"Objects": "Apple", "start": 1628.763, "end": 1628.871}, {"Objects": "Tomato", "start": 1628.871, "end": 1634.942}, {"Objects": "Bowl", "start": 1634.942, "end": 1635.751}, {"Objects": "Tomato", "start": 1635.751, "end": 1639.4360000000001}, {"Objects": "Apple", "start": 1639.4360000000001, "end": 1639.646}, {"Objects": "Tomato", "start": 1639.646, "end": 1646.33}, {"Objects": "Bowl", "start": 1646.33, "end": 1646.4370000000001}, {"Objects": "Tomato", "start": 1646.4370000000001, "end": 1646.5529999999999}, {"Objects": "Bowl", "start": 1646.5529999999999, "end": 1646.682}, {"Objects": "Tomato", "start": 1646.682, "end": 1646.9029999999998}, {"Objects": "Bowl", "start": 1646.9029999999998, "end": 1647.116}, {"Objects": "Tomato", "start": 1647.116, "end": 1647.345}, {"Objects": "Bowl", "start": 1647.345, "end": 1647.469}, {"Objects": "Tomato", "start": 1647.469, "end": 1647.615}, {"Objects": "Bowl", "start": 1647.615, "end": 1647.694}, {"Objects": "Tomato", "start": 1647.694, "end": 1647.9270000000001}, {"Objects": "Bowl", "start": 1647.9270000000001, "end": 1649.067}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div class="error" style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
